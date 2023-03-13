@@ -1463,6 +1463,71 @@ class PlotMixedTypeXY(BasePlot):
             self._chart.style._apply_settings('legend')
         return self._chart
 
+    def bar_floating(self,
+                     data_frame,
+                     categorical_columns,
+                     upper_bound_column,
+                     lower_bound_column,
+                     color_column=None,
+                     color_order=None,
+                     categorical_order_by='labels',
+                     categorical_order_ascending=False):
+
+        vertical = self._chart.axes._vertical
+
+        source, factors, _ = self._construct_source(
+            data_frame,
+            categorical_columns,
+            [lower_bound_column, upper_bound_column],
+            categorical_order_by=categorical_order_by,
+            categorical_order_ascending=categorical_order_ascending,
+            color_column=color_column)
+
+        colors = self._get_color_and_order(
+            data_frame, color_column, color_order, categorical_columns)
+
+        if color_column is None:
+            colors = colors[0]
+
+        self._set_categorical_axis_default_factors(vertical, factors)
+        self._set_categorical_axis_default_range(
+            vertical, data_frame, upper_bound_column)
+        bar_width = self._get_bar_width(factors)
+
+        if color_column:
+            legend = bokeh.core.properties.field('color_column')
+            legend = 'color_column'
+        else:
+            legend = None
+
+        if vertical:
+            self._plot_with_legend(
+                self._chart.figure.vbar,
+                legend_group=legend,
+                x='factors',
+                width=bar_width,
+                top=upper_bound_column,
+                bottom=lower_bound_column,
+                line_color='white',
+                source=source,
+                fill_color=colors,
+            )
+
+        else:
+
+            self._plot_with_legend(
+                self._chart.figure.hbar,
+                legend_group=legend,
+                y='factors',
+                height=bar_width,
+                right=upper_bound_column,
+                left=lower_bound_column,
+                line_color='white',
+                source=source,
+                fill_color=colors,
+            )
+        return self._chart
+
     def interval(self,
                  data_frame,
                  categorical_columns,
