@@ -501,6 +501,44 @@ class TestBarNumericSort:
             chart_data(ch, '')['index'], [0, 1, 2, 3, 4, 5]))
 
 
+class TestBarFloating:
+    def setup(self):
+        self.data = pd.DataFrame({
+            'category': ['c', 'a', 'b'],
+            'upper': [20, 30, 25],
+            'lower': [10, 20, 4],
+            'color': ['a', 'b', 'a']
+        })
+
+    def test_vertical_asc(self):
+        ch = chartify.Chart(x_axis_type='categorical')
+        ch.plot.bar_floating(
+            self.data, ['category'], lower_bound_column='lower',
+            upper_bound_column='upper', categorical_order_ascending=True)
+        assert (np.array_equal(chart_data(ch, '')['factors'], ['a', 'b', 'c']))
+        assert (np.array_equal(chart_data(ch, '')['upper'], [30, 25, 20]))
+        assert (np.array_equal(chart_data(ch, '')['lower'], [20, 4, 10]))
+
+    def test_horizontal_desc(self):
+        ch = chartify.Chart(y_axis_type='categorical')
+        ch.plot.bar_floating(
+            self.data, ['category'], lower_bound_column='lower',
+            upper_bound_column='upper', categorical_order_ascending=False)
+        assert (np.array_equal(chart_data(ch, '')['factors'], ['c', 'b', 'a']))
+        assert (np.array_equal(chart_data(ch, '')['upper'], [20, 25, 30]))
+        assert (np.array_equal(chart_data(ch, '')['lower'], [10, 4, 20]))
+
+    def test_color(self):
+        ch = chartify.Chart(y_axis_type='categorical')
+        ch.plot.bar_floating(
+            self.data, ['category'], lower_bound_column='lower',
+            upper_bound_column='upper', categorical_order_ascending=True,
+            color_column='color')
+        assert (np.array_equal(chart_data(ch, '')['factors'], ['a', 'b', 'c']))
+        assert (np.array_equal(chart_data(ch, '')[
+                'color_column'], ['b', 'a', 'a']))
+
+
 class TestBarStacked:
     """Tests for stacked bar plots"""
 
